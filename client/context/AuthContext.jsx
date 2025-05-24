@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   // check if user is authenticated and if so, set the user data and connect the socket
   const checkAuth = async () => {
     try {
-      const { data } = await axios.get("/api/auth/check");
+      const { data } = await axios.get("/api/user/check");
       if (data.success) {
         setAuthUser(data.user);
         connectSocket(data.user);
@@ -32,16 +32,26 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await axios.post(`/api/user/${state}`, credentials);
       if (data.success) {
-        setAuthUser(data.userData);
-        connectSocket(data.userData);
+        // save token and user info
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("email", JSON.stringify(data.userData.email));
+
+        // set auth headers and update app state
         axios.defaults.headers.common["token"] = data.token;
         setToken(data.token);
-        localStorage.setItem("token", data.token);
+        setAuthUser(data.userData);
+        connectSocket(data.userData);
+
         toast.success(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
       console.log(error);
+      // Check if server responded with a specific error message
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong!";
+      toast.error(errorMessage);
     }
   };
 
@@ -89,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       axios.defaults.headers.common["token"] = token;
     }
-    checkAuth;
+    checkAuth();
   }, []);
 
   const value = {

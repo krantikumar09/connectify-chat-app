@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import assets from "../assets/assets";
 import { AuthContext } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
@@ -8,12 +9,19 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
 
   const { login } = useContext(AuthContext);
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
+
+
+    if (!agreed) {
+      toast.error("Please agree to the Privacy Policy.");
+      return;
+    }
 
     if (currentState === "Sign Up" && !isDataSubmitted) {
       setIsDataSubmitted(true);
@@ -96,8 +104,12 @@ const LoginPage = () => {
           ></textarea>
         )}
 
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <input type="checkbox" name="" id="" />
+        <div className="flex items-start gap-2 text-sm text-gray-500">
+          <input
+            onChange={(e) => setAgreed(e.target.checked)}
+            value={agreed}
+            type="checkbox"
+          />
           <p>Agree to the terms of use & privacy policy.</p>
         </div>
 

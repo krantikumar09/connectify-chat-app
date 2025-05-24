@@ -5,9 +5,8 @@ import cloudinary from "../lib/cloudinary.js";
 
 // signup a new user
 export const signup = async (req, res) => {
-
   if (!req.body) {
-    return res.json({ success: false, message: "Req body is missing!"});
+    return res.json({ success: false, message: "Req body is missing!" });
   }
 
   const { fullName, email, password, bio } = req.body;
@@ -53,19 +52,24 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // check if user is exists
     const userData = await User.findOne({ email });
+    if (!userData) {
+      return res.json({ success: false, message: "User not found!" });
+    }
 
+    // check if password is correct
     const isPasswordCorrect = await bcrypt.compare(password, userData.password);
-
     if (!isPasswordCorrect) {
       return res.json({ success: false, message: "Invalid credentials!" });
     }
 
+    // generate token
     const token = generateToken(userData._id);
 
     res.json({ success: true, userData, token, message: "Logged in!" });
   } catch (error) {
-    console.log(error);
+    console.log("Login error: ", error);
     res.json({
       success: false,
       message: "Something went wrong! Please try again.",
