@@ -38,7 +38,10 @@ const Sidebar = () => {
       <div className="pb-5">
         {/* logo and profile edit */}
         <div className="flex justify-between items-center">
-          <img src={assets.logo} alt="Connectify" className="max-w-40" />
+          <div className="flex items-center gap-2">
+            <img src={assets.logo_icon} alt="Connectify" className="max-w-6" />
+            <p>Connectify</p>
+          </div>
 
           <div className="relative py-2 group">
             <img
